@@ -9,7 +9,8 @@ class InvoiceController extends Controller
 {
     public function index()
     {
-        return view('invoices.index');
+        $invoices = Invoice::paginate(7);
+        return view('invoices.index', compact('invoices'));
     }
 
     public function create()
@@ -55,4 +56,27 @@ class InvoiceController extends Controller
 
         return redirect()->route('invoices.index')->with('success', 'Invoice created successfully.');
     }
+
+    public function edit(Invoice $invoice)
+     {
+         return view('invoices.edit', compact('invoice'));
+     }
+     
+
+     public function update(Request $request, Invoice $invoice)
+     {
+         $validatedData = $request->validate([
+             // validation rules here
+         ]);
+ 
+         $invoice->update($validatedData);
+         return redirect()->route('invoices.index');
+     }
+ 
+     // Remove the specified invoice from storage.
+     public function destroy(Invoice $invoice)
+     {
+         $invoice->delete();
+         return redirect()->route('invoices.index');
+     }
 }
