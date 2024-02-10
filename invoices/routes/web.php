@@ -32,8 +32,8 @@ Route::post('/invoices', [InvoiceController::class, 'store'])->name('invoices.st
 // Showing the form for editing a specific invoice
 Route::get('/invoices/{invoice}/edit', [InvoiceController::class, 'edit'])->name('invoices.edit');
 
-// // Updating a specific invoice
-// Route::put('/invoices/{invoice}', [InvoiceController::class, 'update'])->name('invoices.update');
+// Updating a specific invoice
+Route::put('/invoices/{invoice}', [InvoiceController::class, 'update'])->name('invoices.update');
 
 // // Deleting a specific invoice
 // Route::delete('/invoices/{invoice}', [InvoiceController::class, 'destroy'])->name('invoices.destroy');
