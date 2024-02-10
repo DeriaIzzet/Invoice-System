@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invoice;
+use App\Models\LineItem;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
@@ -59,18 +60,37 @@ class InvoiceController extends Controller
 
     public function edit(Invoice $invoice)
      {
+        $invoice->load('lineItems');
          return view('invoices.edit', compact('invoice'));
      }
-     
 
-     public function update(Request $request, Invoice $invoice)
+
+     public function update( Invoice $invoice,Request $request)
      {
          $validatedData = $request->validate([
-             // validation rules here
+            'company_name' => 'required',
+            'date' => 'required|date',
+            'customer_name' => 'required',
+            'customer_email' => 'required|email',
+            'line_items.*.description' => 'required|string',
+            'line_items.*.quantity' => 'required|numeric|min:0',
+            'line_items.*.unit_price' => 'required|numeric|between:0,999999.99',
          ]);
  
          $invoice->update($validatedData);
-         return redirect()->route('invoices.index');
+        
+         foreach ($request->line_items as $itemData) {
+            if (isset($itemData['id'])) {
+                // Update existing line item
+                LineItem::find($itemData['id'])->update($itemData);
+            } else {
+                // Create new line item
+                $invoice->lineItems()->create($itemData);
+            }
+        }
+    
+        // Redirect or return response
+        return redirect()->route('invoices.index');
      }
  
      // Remove the specified invoice from storage.
