@@ -29,9 +29,9 @@
             <h2 class="my-4">Line Items</h2>
             <div id="line-items" class="mb-3">
                 <div class="line-item mb-2">
-                    <input type="text" class="" name="line_items[0][description]" placeholder="Description">
-                    <input type="number" class="" name="line_items[0][quantity]" placeholder="Quantity" onchange="updateTotal()">
-                    <input type="number" class="" step="0.01" name="line_items[0][unit_price]" placeholder="Unit Price" onchange="updateTotal()">
+                    <input type="text" class="" name="line_items[0][description]" placeholder="Description" required>
+                    <input type="number" class="" name="line_items[0][quantity]" placeholder="Quantity" onchange="updateTotal()" required>
+                    <input type="number" class="" step="0.01" name="line_items[0][unit_price]" placeholder="Unit Price" onchange="updateTotal()" required>
                     <button type="button" class="" onclick="removeLineItem(this)">Remove</button>
                 </div>
             </div>
