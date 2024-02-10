@@ -1,0 +1,9 @@
+
+/* Background Image Styling */
+.background-image {
+    background-image: url('../1.png'); /* Ensure this path is correct */
+    background-size: cover;
+    background-position: center;
+    height: 93vh; /* Adjust as per your layout */
+    width: 100vw;
+}
