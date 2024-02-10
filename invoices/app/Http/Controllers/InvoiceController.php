@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Invoice;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
 {
     public function index()
-    {  
+    {
         return view('invoices.index');
     }
 
@@ -23,11 +24,29 @@ class InvoiceController extends Controller
             'date' => 'required|date',
             'customer_name' => 'required',
             'customer_email' => 'required|email',
-            // Add other validation rules as necessary
+            'line_items.*.description' => 'required|string',
+            'line_items.*.quantity' => 'required|numeric|min:0',
+            'line_items.*.unit_price' => 'required|numeric|between:0,999999.99',
         ]);
 
-         $invoice = Invoice::create($request->all());
+        // Initialize total amount
+        $totalAmount = 0;
 
+        // Check if line items exist and calculate total amount
+        if ($request->has('line_items')) {
+            foreach ($request->line_items as $item) {
+                $total = $item['quantity'] * $item['unit_price'];
+                $totalAmount += $total;
+            }
+        }
+
+        // Create the invoice with the total amount
+        $invoiceData = $request->all();
+        $invoiceData['total_amount'] = $totalAmount;
+
+        $invoice = Invoice::create($invoiceData);
+
+        // Create line items
         if ($request->has('line_items')) {
             foreach ($request->line_items as $item) {
                 $invoice->lineItems()->create($item);
@@ -36,5 +55,4 @@ class InvoiceController extends Controller
 
         return redirect()->route('invoices.index')->with('success', 'Invoice created successfully.');
     }
-
 }
