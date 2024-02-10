@@ -8,6 +8,7 @@
 
         <form action="{{ route('invoices.store') }}" method="POST" class="mb-3">
             @csrf
+            @method('post')
             <div class="mb-3">
                 <label for="company_name" class="form-label">Company Name:</label>
                 <input type="text" class="form-control" id="company_name" name="company_name" placeholder="Company Name" required>
@@ -28,10 +29,10 @@
             <h2 class="my-4">Line Items</h2>
             <div id="line-items" class="mb-3">
                 <div class="line-item mb-2">
-                    <input type="text" class="form-control mb-2" name="line_items[0][description]" placeholder="Description">
-                    <input type="number" class="form-control mb-2" name="line_items[0][quantity]" placeholder="Quantity" onchange="updateTotal()">
-                    <input type="number" class="form-control mb-2" step="0.01" name="line_items[0][unit_price]" placeholder="Unit Price" onchange="updateTotal()">
-                    <button type="button" class="btn btn-danger btn-sm" onclick="removeLineItem(this)">Remove</button>
+                    <input type="text" class="" name="line_items[0][description]" placeholder="Description">
+                    <input type="number" class="" name="line_items[0][quantity]" placeholder="Quantity" onchange="updateTotal()">
+                    <input type="number" class="" step="0.01" name="line_items[0][unit_price]" placeholder="Unit Price" onchange="updateTotal()">
+                    <button type="button" class="" onclick="removeLineItem(this)">Remove</button>
                 </div>
             </div>
             <button type="button" class="btn btn-primary btn-sm mb-3" onclick="addLineItem()">Add Line Item</button>
