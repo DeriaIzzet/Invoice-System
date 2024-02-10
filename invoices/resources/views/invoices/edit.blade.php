@@ -50,7 +50,7 @@
                 <input type="number" name="line_items[0][quantity]" value="{{ $line_item->quantity }}" required>
                 <input type="number" name="line_items[0][unit_price]" value="{{ $line_item->unit_price }}" required>
                 @if ($index > 0)
-                 <button type="button" onclick="markForDeletion({{ $line_item->id }})">Delete</button>
+                <button type="button" onclick="markForDeletion({{ $line_item->id }})">Delete</button>
                 @endif
             </div>
             @endforeach
@@ -68,41 +68,54 @@
             <input type="number" step="0.01" id="total_amount" readonly value="{{ $invoice->total }}">
         </div>
 
-         <button type="submit" class="btn btn-success">Update Invoice</button>
+        <button type="submit" class="btn btn-success">Update Invoice</button>
     </form>
 </div>
 
 <script>
-    let lineItemIndex = {{ is_null($invoice->line_items)? 0 : count($invoice->line_items) }};
+    let lineItemIndex = {{ $invoice->l in eItems ? count($invoice->lineIte ms ) : 0 }};
 
-    function addLineItem() {
-        const container = document.getElementById('line-items');
-        const newItem = document.createElement('div');
-        newItem.classList.add('line-item');
-        newItem.innerHTML = `
-            <input type="text" name="line_items[${lineItemIndex}][description]" placeholder="Description">
-            <input type="number" name="line_items[${lineItemIndex}][quantity]" placeholder="Quantity" onchange="updateTotal()">
-            <input type="number" step="0.01" name="line_items[${lineItemIndex}][unit_price]" placeholder="Unit Price" onchange="updateTotal()">
-            <button type="button" onclick="removeLineItem(this)">Remove</button>
-        `;
-        container.appendChild(newItem);
-        lineItemIndex++;
-    }
+function addLineItem() {
+    const container = document.getElementById('line-items');
+    const newItem = document.createElement('div');
+    newItem.classList.add('line-item');
+    newItem.innerHTML = `
+        <input type="text" name="line_items[${lineItemIndex}][description]" placeholder="Description">
+        <input type="number" name="line_items[${lineItemIndex}][quantity]" placeholder="Quantity" onchange="updateTotal()">
+        <input type="number" step="0.01" name="line_items[${lineItemIndex}][unit_price]" placeholder="Unit Price" onchange="updateTotal()">
+        <button type="button" onclick="removeLineItem(this)">Remove</button>
+    `;
+    container.appendChild(newItem);
+    lineItemIndex++;
+}
 
-    function removeLineItem(button) {
-        button.parentElement.remove();
-        updateTotal();
-    }
+function removeLineItem(button) {
+    button.parentElement.remove();
+    updateTotal();
+}
 
-    function updateTotal() {
-        const lineItems = document.querySelectorAll('.line-item');
-        let total = 0;
-        lineItems.forEach(item => {
-            const quantity = item.querySelector('[name^="line_items"][name$="[quantity]"]').value || 0;
-            const unitPrice = item.querySelector('[name^="line_items"][name$="[unit_price]"]').value || 0;
-            total += parseFloat(quantity) * parseFloat(unitPrice);
-        });
-        document.getElementById('total_amount').value = total.toFixed(2);
+function updateTotal() {
+    const lineItems = document.querySelectorAll('.line-item');
+    let total = 0;
+    lineItems.forEach(item => {
+        const quantity = item.querySelector('[name^="line_items"][name$="[quantity]"]').value || 0;
+        const unitPrice = item.querySelector('[name^="line_items"][name$="[unit_price]"]').value || 0;
+        total += parseFloat(quantity) * parseFloat(unitPrice);
+    });
+    document.getElementById('total_amount').value = total.toFixed(2);
+}
+
+function markForDeletion(lineItemId) {
+    // Optional: Logic to hide or remove the line item element from the forample: document.getElementById(`line-item-${lineItemId}`).style.display = 'none';
+
+    // Add the line item ID to the deleted_line_items input
+    var deletedItems = document.getElementById('deleted_line_items').value;
+    if (deletedItems) {
+        deletedItems += ',' + lineItemId;
+    } else {
+        deletedItems = lineItemId.toString();
     }
+    document.getElementById('deleted_line_items').value = deletedItems;
+}
 </script>
 @endsection
