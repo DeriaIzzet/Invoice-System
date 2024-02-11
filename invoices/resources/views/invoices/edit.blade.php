@@ -73,21 +73,22 @@
 </div>
 
 <script>
-    let lineItemIndex = {{ $invoice-> lineItems ? count($invoice -> lineItems) : 0}};
+  let lineItemIndex = document.querySelectorAll('.line-item').length;
 
-    function addLineItem() { 
-        const container = document.getElementById('line-items');
-        const newItem = document.createElement('div');
-        newItem.classList.add('line-item');
-        newItem.innerHTML = `
+    function addLineItem() {
+   
+    const container = document.getElementById('line-items');
+    const newItem = document.createElement('div');
+    newItem.classList.add('line-item');
+    newItem.innerHTML = `
         <input type="text" name="line_items[${lineItemIndex}][description]" placeholder="Description">
         <input type="number" name="line_items[${lineItemIndex}][quantity]" placeholder="Quantity" onchange="updateTotal()">
         <input type="number" step="0.01" name="line_items[${lineItemIndex}][unit_price]" placeholder="Unit Price" onchange="updateTotal()">
         <button type="button" onclick="removeLineItem(this)">Remove</button>
     `;
-        container.appendChild(newItem);
-        lineItemIndex++;
-    }
+    container.appendChild(newItem);
+    lineItemIndex++;
+}
 
     function removeLineItem(button) {
         button.parentElement.remove();
@@ -99,35 +100,37 @@
     let total = 0;
 
     lineItems.forEach(item => {
-        // Ensure the item is not marked for deletion
+        // Check if the line item is visible and not disabled
         if (item.style.display !== 'none') {
-            const quantityInput = item.querySelector('[name^="line_items"][name$="[quantity]"]');
-            const unitPriceInput = item.querySelector('[name^="line_items"][name$="[unit_price]"]');
+            const quantityInput = item.querySelector('[name*="[quantity]"]');
+            const unitPriceInput = item.querySelector('[name*="[unit_price]"]');
 
-            const quantity = quantityInput ? parseFloat(quantityInput.value) || 0 : 0;
-            const unitPrice = unitPriceInput ? parseFloat(unitPriceInput.value) || 0 : 0;
+            if (!quantityInput.disabled && !unitPriceInput.disabled) {
+                const quantity = parseFloat(quantityInput.value) || 0;
+                const unitPrice = parseFloat(unitPriceInput.value) || 0;
 
-            total += quantity * unitPrice;
+                total += quantity * unitPrice;
+            }
         }
     });
 
     document.getElementById('total_amount').value = total.toFixed(2);
 }
 
-    function markForDeletion(lineItemId, element) {
-       
-        // Hide the line item element
-        element.closest('.line-item').style.display = 'none';
 
-        // Add the line item ID to the deleted_line_items input
-        var deletedItems = document.getElementById('deleted_line_items').value;
-        if (deletedItems) {
-            deletedItems += ',' + lineItemId;
-        } else {
-            deletedItems = lineItemId.toString();
-        }
-        document.getElementById('deleted_line_items').value = deletedItems;
-    }
+function markForDeletion(lineItemId, element) {
+    const lineItemElement = element.closest('.line-item');
+    lineItemElement.style.display = 'none'; // Hide the line item
+    lineItemElement.querySelectorAll('input').forEach(input => input.disabled = true); // Disable inputs
+
+    // Add the line item ID to the deleted_line_items input
+    const deletedItemsField = document.getElementById('deleted_line_items');
+    deletedItemsField.value = deletedItemsField.value ? 
+                               deletedItemsField.value + ',' + lineItemId :
+                               lineItemId.toString();
+
+    updateTotal(); // Recalculate total
+}
  
 </script>
 @endsection
