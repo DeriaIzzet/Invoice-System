@@ -66,74 +66,87 @@ class InvoiceController extends Controller
         return view('invoices.edit', compact('invoice'));
     }
 
-    private function validateLineItemData(array $data)
-    {
-        // Define your validation rules here
-        $rules = [
-            'description' => 'required|string|max:255',
-            'quantity' => 'required|numeric|min:0',
-            'unit_price' => 'required|numeric|between:0,999999.99',
-        ];
-
-        $validator = Validator::make($data, $rules);
-        // Validate the data against the rules
-        if ($validator->fails()) {
-            // You can throw an exception, or handle it as needed
-            throw new \Illuminate\Validation\ValidationException($validator);
-        }
-
-        // The validate method will throw an exception if validation fails.
-        // The validated data will be returned if validation passes.
-        return $validator->validated();
-    }
-
-
     public function update(Invoice $invoice, Request $request)
-    {
-        DB::transaction(function () use ($invoice, $request) {
-        $validatedData = $request->validate([
+{
+    // Start database transaction
+    DB::transaction(function () use ($invoice, $request) {
+        // Validate the main invoice data
+        $validatedInvoiceData = $request->validate([
             'company_name' => 'required',
             'date' => 'required|date',
             'customer_name' => 'required',
             'customer_email' => 'required|email',
-           
+            // Include other invoice fields as necessary
         ]);
 
-        $invoice->update($validatedData);
+        // Update the invoice with validated data
+        $invoice->update($validatedInvoiceData);
 
-    // Collect IDs of line items to be deleted
-    $deletedLineItemIds = explode(',', $request->input('deleted_line_items', ''));
+        // Collect IDs of line items marked for deletion
+        $deletedLineItemIds = explode(',', $request->input('deleted_line_items', ''));
 
-    // Process each line item in the request
-    foreach ($request->line_items as $index => $itemData) {
-        // Skip validation and deletion if the line item is marked for deletion
-        if (in_array($itemData['id'] ?? '', $deletedLineItemIds)) {
-            continue;
+        // Initialize total amount
+        $totalAmount = 0;
+
+        // Process each line item in the request
+        foreach ($request->line_items as $itemData) {
+            // Check if line item is marked for deletion
+            if (in_array($itemData['id'] ?? '', $deletedLineItemIds)) {
+                continue;
+            }
+
+            // Validate line item data
+            $validatedLineItem = $this->validateLineItemData($itemData);
+
+            if (isset($itemData['id'])) {
+                // Update existing line item
+                $lineItem = LineItem::find($itemData['id']);
+                $lineItem->update($validatedLineItem);
+            } else {
+                // Create new line item and associate with the invoice
+                $lineItem = $invoice->lineItems()->create($validatedLineItem);
+            }
+
+            // Add to total amount
+            $totalAmount += $lineItem->quantity * $lineItem->unit_price;
         }
 
-         $validatedLineItem = $this->validateLineItemData($itemData);
+        // Delete line items marked for deletion
+        LineItem::destroy($deletedLineItemIds);
 
-        if (isset($itemData['id'])) {
-            // Update existing line item
-            LineItem::find($itemData['id'])->update($itemData);
-        } else {
-            // Create new line item
-            $invoice->lineItems()->create($itemData);
-        }
-    }
+        // Update the total amount of the invoice
+        $invoice->total_amount = $totalAmount;
+        $invoice->save();
+    });
 
-    // Delete line items that were marked for deletion
-    LineItem::destroy($deletedLineItemIds);
-});
-    // Redirect or return response
+    // Redirect or return a response after successful update
     return redirect()->route('invoices.index');
 }
-    
+
+    private function validateLineItemData(array $data)
+    {
+        $validator = Validator::make($data, [
+            'description' => 'required|string|max:255',
+            'quantity' => 'required|numeric|min:0',
+            'unit_price' => 'required|numeric|between:0,999999.99',
+        ]);
+
+        if ($validator->fails()) {
+            throw new \Illuminate\Validation\ValidationException($validator);
+        }
+
+        return $validator->validated();
+    }
+
+
 
     // Remove the specified invoice from storage.
-    public function destroy(Invoice $invoice)
-    {
-        $invoice->delete();
-        return redirect()->route('invoices.index');
-    }
+    public function destroy($id)
+{
+    $invoice = Invoice::findOrFail($id);
+    $invoice->delete();
+
+    // Redirect to a certain page or return a response
+    return redirect()->route('invoices.index')->with('success', 'Invoice deleted successfully.');
+}
 }
