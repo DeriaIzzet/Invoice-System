@@ -35,5 +35,5 @@ Route::get('/invoices/{invoice}/edit', [InvoiceController::class, 'edit'])->name
 // Updating a specific invoice
 Route::put('/invoices/{invoice}', [InvoiceController::class, 'update'])->name('invoices.update');
 
-// // Deleting a specific invoice
-// Route::delete('/invoices/{invoice}', [InvoiceController::class, 'destroy'])->name('invoices.destroy');
+// Deleting a specific invoice
+Route::delete('/invoices/{invoice}', [InvoiceController::class, 'destroy'])->name('invoices.destroy');
