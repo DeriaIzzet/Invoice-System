@@ -30,7 +30,7 @@
                                 <td>{{ $invoice->customer_name }}</td>
                                 <td>${{ number_format($invoice->total_amount, 2) }}</td>
                                 <td>
-                                    <a href="" class="btn btn-info btn-sm">View</a>
+                                <a href="{{ route('invoices.show', $invoice->id) }}" class="btn btn-info btn-sm">View</a>
                                     <a href="{{ route('invoices.edit', $invoice) }}" class="btn btn-primary btn-sm">Edit</a>
                                     <form action="{{ route('invoices.destroy', $invoice->id) }}" method="POST" style="display: inline;">
                                         @csrf
