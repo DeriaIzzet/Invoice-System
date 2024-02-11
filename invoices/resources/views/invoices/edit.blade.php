@@ -16,7 +16,7 @@
     </div>
     <form action="{{ route('invoices.update', $invoice->id) }}" method="POST" class="mb-3">
         @csrf
-        @method('PUT')
+        @method('POST')
         <div class="mb-3">
             <label for="company_name" class="form-label">Company Name:</label>
             <input type="text" class="form-control" id="company_name" name="company_name" placeholder="Company Name"
