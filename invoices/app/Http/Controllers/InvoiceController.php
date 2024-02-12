@@ -14,10 +14,23 @@ use Exception;
 
 class InvoiceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $userId = Auth::user()->id;
-        $invoices = Invoice::where('user_id', '=', $userId)->paginate(7);
+        $searchQuery = $request->input('search');
+
+        $invoices = Invoice::where('user_id', $userId)
+            ->when($searchQuery, function ($query) use ($searchQuery) {
+                if (is_numeric($searchQuery)) {
+                    // Search by invoice ID (integer comparison)
+                    $query->where('id', $searchQuery);
+                } else {
+                    // Search by customer name (string comparison)
+                    $query->where('customer_name', 'LIKE', "%{$searchQuery}%");
+                }
+            })
+            ->paginate(7);
+
         return view('invoices.index', compact('invoices'));
     }
 
