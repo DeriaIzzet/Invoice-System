@@ -3,15 +3,16 @@
 @section('content')
 
 <div class="container mt-4">
-    <form action="{{ route('invoices.index') }}" method="GET" class="form-inline my-2 my-lg-0">
-        <input type="text" name="search" class="form-control mr-sm-2" placeholder="Search invoices..."
-            value="{{ request('search') }}">
-        <button type="submit" class="btn btn-outline-success my-2 my-sm-0">Search</button>
-    </form>
     <div class="row">
-
+        
         <div class="col-md-12">
-
+            
+            <form action="{{ route('invoices.index') }}" method="GET" class="form-inline my-2 my-lg-0">
+                <input type="text" name="search" class="form-control mr-sm-2" placeholder="Search invoices..."
+                    value="{{ request('search') }}">
+                <button type="submit" class="btn btn-outline-success my-2 my-sm-0">Search</button>
+            </form>
+            
             <h2 class="mb-3"> All Invoices</h2>
             @if ($invoices->isEmpty())
             <div class="alert alert-info">No invoices found.</div>
