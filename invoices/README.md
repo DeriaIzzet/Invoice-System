@@ -40,26 +40,26 @@ cp .env.example .env
 ### Generate Application Key
 php artisan key:generate
 
-## Migrations
+### Migrations
 
-# Migrate the database to set up the necessary tables.
+#### Migrate the database to set up the necessary tables.
 
 cd invoices
 php artisan migrate
 
-# Start the Application
+### Start the Application
 Serve the application on a development server.
 
 php artisan serve
 Access the application at http://localhost:8000.
 
-## Usage
+### Usage
 - **Registration and Login: Users must register and log in to access the invoice management features.
 - **Managing Invoices: Navigate to the invoices section in the application to perform CRUD operations on invoices.
 - **Adding Line Items: While creating or editing an invoice, users can add multiple line items.
 
 
-## License
+### License
 none
 
 
